@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<head>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <!-- <script src="js/client.js"></script> -->
+    <!-- <script src="js/pad.js"></script> -->
+    <script>
+        $(document).ready(function() {
+            $('.key').click(function() {
+                var button = $(this);
+                button.addClass('key-pressed');
+                setTimeout(function () {
+                    button.removeClass('key-pressed');
+                }, 200)
+                var note = $(this).attr('data-key');
+                console.log(note); //print in console
+                $.post('/soundparticipant', {"note": note}, function(data) {
+                    console.log(data)
+                    return("note": note);
+                })
+                .done(() => console.log('done'))
+                .fail((err) => console.log(err))
+            });
+        });
+    </script>
+    <title>pad</title>
+    <link rel="stylesheet" href="css/pad.css" >
+</head>
+
+<body>
+    <div id="drum-pad">
+        <span data-key="drone" class="key" >
+            <a href="">Drone</a>
+        </span>
+        <span data-key="A4" class="key">
+            A4
+        </span>
+        <span data-key="A35" class="key">
+            A3-triad
+        </span>
+        <span data-key="C4" class="key">
+            C4
+        </span>
+        <span data-key="C25" class="key">
+            C2-maj5
+        </span>
+        <span data-key="D4" class="key">
+            D4
+        </span>
+        <span data-key="D24" class="key">
+            D2-sus
+        </span>
+        <span data-key="D33" class="key">
+            D3-maj
+        </span>
+        <span data-key="DG3" class="key">
+            D3-G3
+        </span>
+        <span data-key="E24" class="key">
+            E2-sus
+        </span>
+        <span data-key="EF4" class="key">
+            E4-F4
+        </span>
+        <span data-key="F24" class="key">
+            F2-sus
+        </span>
+        <span data-key="F33" class="key">
+            F3-maj
+        </span>
+        <span data-key="G4" class="key">
+            G4
+        </span>
+        <span data-key="G34" class="key">
+            G3-maj4
+        </span>
+        <span data-key="G35" class="key">
+            G3-triad
+        </span>
+        <span data-key="A3min" class="key">
+            A3-min
+        </span>
+        <span data-key="E4" class="key">
+            A3-maj4
+        </span>
+        <span data-key="A34" class="key">
+            A3-maj4
+        </span>
+        <span data-key="GF4" class="key">
+            G4-F4
+        </span>
+        <span data-key="E4" class="key">
+            A3-maj4
+        </span>
+    </div>
+</body>
+</html>

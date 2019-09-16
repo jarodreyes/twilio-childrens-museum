@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="shortcut icon" href="/img/favicon_57.png"/>
+  <link rel="apple-touch-icon" href="/img/favicon_57.png"/>
+  <link rel="apple-touch-icon" sizes="72x72" href="/img/favicon_72.png"/>
+  <link rel="apple-touch-icon" sizes="114x114" href="/img/favicon_114.png"/>
+  <title>OKGO/Twilio - <%= note %></title>
+  <link rel="stylesheet" href="/css/bell.css">
+</head>
+<body class="vbox viewport">
+  <div id="log"></div>
+  <% if (note.length >= 3) { %>
+    <div class="action <%= note[0] %><%= note[1] %>">
+  <% } else { %>
+    <div class="action <%= note[0] %>">
+  <% } %>
+  <% icons.forEach(function(icon) { %>
+      <div class="media">
+        <img src="<%=icon%>" >
+      </div>
+  <% }) %>
+    <h2><%= note %></h2>
+  </div>
+  <div class="accent"></div>
+  <!-- <div id="controls">
+    <div id="call-controls" class="hbox hidden">
+      <button id="button-call" class="button grid-sq">Call</button>
+      <button id="button-hangup" class="button grid-sq">Hangup</button>
+    </div>
+  </div> -->
+
+
+  <script type="text/javascript" src="/js/twilio.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="/js/bell.js"></script>
+  <script type="text/javascript">
+    const note = `<%= note %>`;
+    let audioStream, 
+        handbell,
+        name;
+
+    const addHighlight = (state) => {
+        $('.action').toggleClass('live')
+    }
+
+    $(document).ready(function() {
+      handbell = new HandBell({name: note, el:'handbellAudio'});
+      $('.action').on('touchstart click', function(e) {
+        if (handbell.source && handbell.source.loop) {
+          handbell.stopNote();
+          addHighlight(true);
+        } else {
+          handbell.playNote();
+          addHighlight(false);
+        }
+      });
+      
+    });
+  </script>
+</body>
+</html>

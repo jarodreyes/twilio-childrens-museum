@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="shortcut icon" href="/img/favicon_57.png"/>
+  <link rel="apple-touch-icon" href="/img/favicon_57.png"/>
+  <link rel="apple-touch-icon" sizes="72x72" href="/img/favicon_72.png"/>
+  <link rel="apple-touch-icon" sizes="114x114" href="/img/favicon_114.png"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+  <title>OKGO/Twilio - <%= color %></title>
+  <link rel="stylesheet" href="/css/live.css">
+</head>
+<body id="body" class="vbox viewport <%= color %>">
+  <% for(var i=0; i < notes.length; i++) { %>
+    <audio src="/audio/<%= notes[i] %>.mp3" class="hidden audienceAudio <%= notes[i] %>" preload="auto" controls playsinline></audio>
+  <% } %>
+    <section class="main hbox">
+        <div class="note-btn grid-sq left" data-note="<%= notes[0] %>"></div>
+        <div class="note-btn grid-sq center" data-note="<%= notes[1] %>"><h2>OK GO - <%= color %></h2></div>
+        <div class="note-btn grid-sq right" data-note="<%= notes[2] %>"></div>
+    </section>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="/js/bell.js"></script>
+  <script type="text/javascript">
+    const notes = <%- JSON.stringify(notes) %>;
+    let handbells = {};
+    let handbell, name, timeKey;
+
+    $(document).ready(function() {
+      let body = document.getElementById('body');
+      if (body.requestFullscreen) {
+        console.log('Requesting Full Screen')
+        body.requestFullscreen();
+      }
+      for(var i=0; i < notes.length; i++) {
+        let note = notes[i];
+        handbells[note] = new HandBell({name: note});
+      }
+      $('.note-btn').on('touchstart', ev => {
+        let note = $(ev.currentTarget).data('note');
+        handbells[note].playNote();
+        $(ev.currentTarget).addClass('live');
+        setTimeout(function() {
+            $(ev.currentTarget).removeClass('live');
+        }, 300);
+        ev.stopPropagation();
+      });
+
+      let aud = document.querySelector(`.e_flat_5`);
+      console.log(aud)
+
+      aud.addEventListener("timeupdate", logTime)
+      function logTime() {
+        console.timeEnd(timeKey)
+      }
+
+      
+    });
+  </script>
+</body>
+</html>

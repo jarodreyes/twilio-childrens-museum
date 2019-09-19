@@ -1,30 +1,32 @@
 const fs = require('fs');
 const NounProject = require('the-noun-project');
-const notes = [];
 
 // Get list of available notes from asset folder
 const getNotesFromDirectory = (dir) => {
-  try {
-     
-    if (dir.length <= 2) {
-        console.log("Usage: " + __filename + " path/to/directory");
-    }
-     
-    var path = dir;
-     
-    fs.readdir(path, function(err, items) {
-        console.log(items);
-     
-        for (var i=0; i<items.length; i++) {
-            let note = (items[i]).slice(0, -4);
-            console.log(note);
-            notes.push(note);
+  return new Promise((resolve, reject) => {
+      const notes = [];
+      try {
+         
+        if (dir.length <= 2) {
+            console.log("Usage: " + __filename + " path/to/directory");
         }
-    });
-    return notes;
-  } catch (e) {
-    return console.log(`Error in getNotes: ${e}`);
-  }
+         
+        var path = dir;
+         
+        fs.readdir(path, function(err, items) {
+            console.log(items);
+         
+            for (var i=0; i<items.length; i++) {
+                let note = (items[i]).slice(0, -4);
+                console.log(note);
+                notes.push(note);
+            }
+            resolve(notes);
+        });
+      } catch (e) {
+        reject(e);
+      }
+  });
 }
 
 const nounProject = new NounProject({

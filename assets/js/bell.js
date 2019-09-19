@@ -1,10 +1,12 @@
 
 class HandBell {
-    constructor({name, el, url}) {
+    constructor({name, genre}) {
         // defaults
+        console.log('Handbell starting')
         this.name = name;
         this.audioBuffer = undefined;
-        this.url = `/audio/${name}.mp3`;
+        this.url = `/audio/${genre}/${name}.mp3`;
+        console.log(this.url);
         if (window.AudioContext) {
             this.context = new AudioContext()
         } else {

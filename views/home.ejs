@@ -9,18 +9,14 @@
   <link rel="stylesheet" href="/css/bell.css">
 </head>
 <body class="vbox viewport">
-  <div id="log"></div>
-  <% notes.forEach(function(note) { %>
-      <a href="/sound/<%=genre%>/<%=note%>" class="key">
-          <%= note %>
-      </span>
-  <% }) %>
-  <div class="accent"></div>
+  <div class="menu card">
+    <a href="/genre/World">Children's Default</a>
+    <a href="/genre/HipHop">Hip Hop</a>
+  </div>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
   <script src="/js/bell.js"></script>
   <script type="text/javascript">
-    // const notes = <%= notes %>;
 
     $(document).ready(function() {
       

@@ -37,18 +37,18 @@
   }
 
   $(document).ready(function () {
-    // setTimeout(() => {
-    //   console.log(socket);
-    //   socket.on('start_song', () => {
-    //     Tone.Transport.start();
-    //     console.log('Starting Song!');
-    //   })
+    setTimeout(() => {
+      console.log(socket);
+      socket.on('start_song', () => {
+        Tone.Transport.start();
+        console.log('Starting Song!');
+      })
 
-    //   socket.on('play_sound', (msg) => {
-    //     console.log(msg);
-    //     window[msg].mute = false;
-    //   })
-    // }, 10000)
+      socket.on('play_sound', (msg) => {
+        console.log(msg);
+        window[msg.note].mute = msg.action == 'stop';
+      })
+    }, 1000)
   });
 </script>
 </html>

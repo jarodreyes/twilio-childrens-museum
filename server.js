@@ -34,12 +34,16 @@ app.use(sassMiddleware({
 }));
 
 io.on('connection', function (socket) {
-    socket.on('play_sound', function (msg) {
-        console.log(msg);
+    console.log('Socket connected')
+    socket.on('trigger_sound', (msg) => {
+      console.log(msg.action);
+      io.emit('play_sound', msg);
+      io.emit('start_song', msg);
     });
 
-    socket.on('start_song', function (msg) {
+    socket.on('trigger_song', function (msg) {
         console.log(`Start: ${msg}`);
+        io.emit('start_song', msg);
     });
     socket.on('disconnect', function () {
         console.log('user disconnected');
@@ -69,10 +73,12 @@ app.get('/', function(req, res){
 .get('/genre/:name', genreRoute)
 .get('/combined/:name', combinedRoute)
 .get('/sound/:genre/:note', async function(req, res){
-  console.log(req.params.note);
   let icons = await getIcon(req.params.note);
-  console.log(icons);
   res.render('phone-bell', {note: req.params.note, icons: icons, genre: req.params.genre});
+})
+.get('/trigger/:genre/:note', async function(req, res){
+  let icons = await getIcon(req.params.note);
+  res.render('touch-socket', {note: req.params.note, icons: icons, genre: req.params.genre});
 });
 app.use(express.static('assets')); //display background
 // app.use(soundRouter);

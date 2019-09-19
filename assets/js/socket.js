@@ -1,4 +1,4 @@
-const socket = io('http://localhost');
+const socket = io();
 
 socket.on('reconnect_attempt', () => {
   socket.io.opts.transports = ['polling', 'websocket'];

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="shortcut icon" href="/img/favicon_57.png"/>
+  <link rel="apple-touch-icon" href="/img/favicon_57.png"/>
+  <link rel="apple-touch-icon" sizes="72x72" href="/img/favicon_72.png"/>
+  <link rel="apple-touch-icon" sizes="114x114" href="/img/favicon_114.png"/>
+  <title>NCM & Twilio</title>
+  <link rel="stylesheet" href="/css/bell.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+</head>
+<body class="vbox viewport">
+  <div id="log"></div>
+  <div class="action <%= note[0] %>">
+    <% icons.forEach(function(icon) { %>
+      <div class="media">
+        <img src="<%=icon%>" >
+      </div>
+    <% }) %>
+    <% note.split('_').forEach(function(n) { %>
+      <h2><%= n %></h2>
+    <% }) %>
+  </div>
+  <div class="accent"></div>
+
+  <script type="text/javascript" src="/js/socket.io.slim.js"></script>
+  <script type="text/javascript" src="/js/socket.js"></script>
+  <script src="/js/bell.js"></script>
+  <script type="text/javascript">
+    const note = `<%- note %>`;
+    const genre = `<%- genre %>`;
+    let audioStream, 
+        handbell,
+        playing,
+        name;
+
+    const addHighlight = (state) => {
+        $('.action').toggleClass('live')
+    }
+
+    $(document).ready(function() {
+      handbell = new HandBell({name: note, genre:genre});
+      $('.action').on('touchstart click', function(e) {
+        if (playing) {
+          socket.emit('trigger_sound', {note: note, action: 'stop'});
+          playing = false;
+          console.log('sent sound with source I think');
+          addHighlight(true);
+        } else {
+          socket.emit('trigger_sound', {note: note, action: 'start'});
+          playing = true;
+          console.log('sent sound I think');
+          addHighlight(false);
+        }
+      });
+      
+    });
+  </script>
+</body>
+</html>

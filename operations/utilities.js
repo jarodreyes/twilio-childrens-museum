@@ -1,5 +1,11 @@
 const fs = require('fs');
 const NounProject = require('the-noun-project');
+console.log(process.env.NOUN_PROJECT_KEY);
+const nounProject = new NounProject({
+    key: process.env.NOUN_PROJECT_KEY,
+    secret: process.env.NOUN_PROJECT_SECRET
+});
+console.log(nounProject);
 
 // Get list of available notes from asset folder
 const getNotesFromDirectory = (dir) => {
@@ -29,18 +35,13 @@ const getNotesFromDirectory = (dir) => {
   });
 }
 
-const nounProject = new NounProject({
-    key: process.env.NOUN_PROJECT_KEY,
-    secret: process.env.NOUN_PROJECT_SECRET
-});
-
 const getIconsFromApi = (word) => {
     return new Promise((resolve, reject) => {
         nounProject.getIconsByTerm(word, {limit: 5}, function (err, data) {
             if (!err) {
-                console.log(data.icons[0].preview_url);
                 resolve(data.icons[0].preview_url);
             } else {
+                console.log(`Error message ${err}`);
                 reject(err);
             }
         });
@@ -49,7 +50,7 @@ const getIconsFromApi = (word) => {
 
 
 const getIconFromNote = async (note) => {
-    let sections = note.split(' ');
+    let sections = note.split('_');
     let icons = [];
     for (let i = 0; i < sections.length; i++) {
         let icon = await getIconsFromApi(sections[i]).catch((err) => { console.error(err); });

@@ -1,30 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <link rel="shortcut icon" href="/img/favicon_57.png"/>
-  <link rel="apple-touch-icon" href="/img/favicon_57.png"/>
-  <link rel="apple-touch-icon" sizes="72x72" href="/img/favicon_72.png"/>
-  <link rel="apple-touch-icon" sizes="114x114" href="/img/favicon_114.png"/>
-  <title>NCM & Twilio</title>
-  <link rel="stylesheet" href="/css/bell.css">
-</head>
-<body class="vbox viewport">
-  <div id="log"></div>
+<%- include('header') -%>
+<div class="scrollable">
+<ul class="list">
   <% notes.forEach(function(note) { %>
-      <a href="/sound/<%=genre%>/<%=note%>" class="key">
-          <%= note %>
-      </span>
+      <a href="/sound/<%=genre%>/<%=note%>" class="list-item">
+        <span class="list-item__center"><%= note %></span>
+      </a>
   <% }) %>
-  <div class="accent"></div>
-
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-  <script src="/js/bell.js"></script>
-  <script type="text/javascript">
-    // const notes = <%= notes %>;
-
-    $(document).ready(function() {
-      
-    });
-  </script>
+</ul>
+</div>
 </body>
 </html>

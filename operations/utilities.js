@@ -1,11 +1,9 @@
 const fs = require('fs');
 const NounProject = require('the-noun-project');
-console.log(process.env.NOUN_PROJECT_KEY);
 const nounProject = new NounProject({
     key: process.env.NOUN_PROJECT_KEY,
     secret: process.env.NOUN_PROJECT_SECRET
 });
-console.log(nounProject);
 
 // Get list of available notes from asset folder
 const getNotesFromDirectory = (dir) => {

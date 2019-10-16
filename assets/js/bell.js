@@ -47,22 +47,7 @@ class HandBell {
 let lastX, lastY, lastZ;
 let moveCounter = 0;
 
-const movementY = {
-    primed: [-1000, -50],
-    down: [-2, 4]
-}
-
-const left = "-y and -x"
-const right = "-y and +x"
-const forward = "-y and +z"
-
-const onTimeUpdate = function() {
-    // if (this.currentTime >= 0.6) {
-    //     this.pause();
-    //     this.currentTime=0;
-    // }
-};
-
+// Function for detecting a handbell motion with the phone.
 function handleMotion(e) {
     let acc = e.acceleration;
     if(!acc.hasOwnProperty('x')) {
@@ -71,11 +56,10 @@ function handleMotion(e) {
 
     if(!acc.x) return;
 
-    //only log if x,y,z > 1
+    //only detect actual motion which is greater than 1
     if(Math.abs(acc.x) >= 1 &&
     Math.abs(acc.y) >= 1 &&
     Math.abs(acc.z) >=1) {
-        // console.log('motion', acc);
         if(!lastX) {
             lastX = acc.x;
             lastY = acc.y;
@@ -89,9 +73,7 @@ function handleMotion(e) {
         let deltaZ = Math.abs(acc.z - lastZ);
         
         if(deltaX + deltaY + deltaZ > 3) {
-            // console.log(lastX, acc.x, lastY, acc.y, lastZ, acc.z);
             moveCounter++;
-            // console.log(moveCounter, Math.round(acc.y));
         } else {
             moveCounter = Math.max(0, --moveCounter);
         }
@@ -101,8 +83,6 @@ function handleMotion(e) {
         if(moveCounter > 1 && acc.y < -7) {
             // Make sure we're not calling playNote() twice in a row.
             debounce(handbell.playNote(), 600, true)
-            // console.log(Math.round(lastY), Math.round(acc.y));
-            console.log('PLAY!!!!!!!!!!');
             moveCounter = 0;
             lastZ = 0;
             lastY = 0;

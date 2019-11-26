@@ -127,18 +127,19 @@ html, body, .viewport {
 }
 #controls {
     z-index:2;
-    .button {
-        padding:1em 0em;
-        font-size:3em;
-        border-radius:0;
-    }
+    
+}
+.button {
+    padding:1em 0em;
+    font-size:3em;
+    border-radius:0;
 }
 #log {
     width: 100%;
     position: fixed;
     top: 0px;
     text-align: center;
-    color: white;
+    color: black;
     z-index:5;
     p {
         display: inline;

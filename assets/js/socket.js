@@ -1,4 +1,5 @@
-const socket = io();
+const socket = io('http://jreyes.ngrok.io');
+
 
 socket.on('reconnect_attempt', () => {
   socket.io.opts.transports = ['polling', 'websocket'];

@@ -40,7 +40,7 @@
 
     $(document).ready(function() {
       handbell = new HandBell({name: note, genre:genre});
-      $('.action').on('touchstart click', function(e) {
+      $('.action').on('click', function(e) {
         if (playing) {
           socket.emit('trigger_sound', {note: note, action: 'stop'});
           playing = false;

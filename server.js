@@ -20,9 +20,9 @@ const getIcon = require('./operations/utilities').getIcon
 
 // configuring middleware
 app.set('port', (process.env.PORT || 3000));
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.raw({ type: 'audio/x-wav'})); //vnd.wave
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended:true,limit:'50mb'}));
+// app.use(bodyParser.raw({ type: 'audio/x-wav'})); //vnd.wave
+// app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 app.use(sassMiddleware({
     /* Options */
@@ -60,6 +60,23 @@ const combinedRoute = async (req, res) => {
   res.render('combined', {notes: notes, genre: req.params.name})
 }
 
+const controlsRoute = async (req, res) => {
+  let notes = await getNotes(`./assets/audio/${req.params.name}/`);
+  res.render('controls', {notes: notes, genre: req.params.name})
+}
+
+const saveAudio = async (req, res) => {
+  const file = req.body
+  console.log(req.body)
+  fs.writeFile('song.webm', file, (err) => {
+    // throws an error, you could also catch it here
+    if (err) throw err;
+
+    // success case, the file was saved
+    console.log('Song saved!');
+  });
+}
+
 app.set('etag', false)
 app.use((req, res, next) => {
   res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
@@ -70,6 +87,8 @@ app.use((req, res, next) => {
 app.get('/', function(req, res){
   res.render('home', {});
 })
+.post('/recordings', saveAudio)
+.get('/controls/:name', controlsRoute)
 .get('/genre/:name', genreRoute)
 .get('/combined/:name', combinedRoute)
 .get('/sound/:genre/:note', async function(req, res){

@@ -17,12 +17,16 @@ require('dotenv').load();
 const baseURL = process.env.BASE_URL;
 const getNotes = require('./operations/utilities').getNotes
 const getIcon = require('./operations/utilities').getIcon
+// For uploading
+const multer  = require('multer') 
+const upload = multer();
+const twilio = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 // configuring middleware
 app.set('port', (process.env.PORT || 3000));
 app.use(bodyParser.urlencoded({extended:true,limit:'50mb'}));
 // app.use(bodyParser.raw({ type: 'audio/x-wav'})); //vnd.wave
-// app.use(bodyParser.json());
+app.use(express.json());
 app.set('view engine', 'ejs');
 app.use(sassMiddleware({
     /* Options */
@@ -34,10 +38,10 @@ app.use(sassMiddleware({
 }));
 
 // streaming file
-const ss = require('socket.io-stream');
 
 io.on('connection', function (socket) {
-    console.log('Socket connected')
+    console.log(`Socket ${socket.id} connected.`);
+
     socket.on('trigger_sound', (msg) => {
       console.log(msg.action);
       io.emit('play_sound', msg);
@@ -47,17 +51,14 @@ io.on('connection', function (socket) {
         console.log(`Start: ${msg.action}`);
         io.emit('start_song', msg);
     });
+
     socket.on('disconnect', function () {
         console.log('user disconnected');
     });
+
     socket.on('end_song', function () {
         console.log(`Ending`);
         io.emit('reset_players');
-    });
-
-    ss(socket).on('file', function(stream) {
-      console.log('FILE EMITTED');
-      fs.createWriteStream('test-song.webm').pipe(stream);
     });
 });
 
@@ -79,15 +80,22 @@ const controlsRoute = async (req, res) => {
   res.render('controls', {notes: notes, genre: req.params.name})
 }
 
-const saveAudio = async (req, res) => {
-  const file = req.body
-  console.log(req.body)
-  fs.writeFile('song.webm', file, (err) => {
-    // throws an error, you could also catch it here
-    if (err) throw err;
+const showNumberForm = async (req, res) => {
+  res.render('form', {song: req.params.song})
+}
 
-    // success case, the file was saved
-    console.log('Song saved!');
+const sendSongTwilio = async (req, res) => {
+  console.log(req.body.phone);
+  // let songUrl = `https://jreyes.ngrok.io/songs/${req.params.song}.wav`
+  let songUrl = 'https://jardiohead.s3-us-west-1.amazonaws.com/1990s.mp3'
+  twilio.messages.create({
+    'to': '+12066505813',
+    'from': process.env.TWILIO_NUMBER,
+    'body': `Thank you for playing! Please enjoy the song your child recorded at: ${songUrl}`,
+    'mediaUrl': songUrl
+  }).then((message) => {
+    console.log(message.sid);
+    res.send('ok')
   });
 }
 
@@ -97,24 +105,21 @@ app.use((req, res, next) => {
   next()
 })
 
-const multer  = require('multer') 
-const upload = multer();
-
-app.post('/upload', upload.single('soundBlob'), function (req, res, next) {
+const saveAudio = (req, res, next) => {
   console.log(req.file); // see what got uploaded
 
-  let uploadLocation = __dirname + '/assets/' + req.file.originalname // where to save the file to. make sure the incoming name has a .wav extension
+  let uploadLocation = __dirname + '/assets/songs/' + req.file.originalname // where to save the file to. make sure the incoming name has a .wav extension
 
   fs.writeFileSync(uploadLocation, Buffer.from(new Uint8Array(req.file.buffer))); // write the blob to the server as a file
   res.sendStatus(200); //send back that everything went ok
 
-})
+}
 
 //serve up pad.html
 app.get('/', function(req, res){
   res.render('home', {});
 })
-.post('/recordings', saveAudio)
+.post('/upload', upload.single('soundBlob'), saveAudio)
 .get('/controls/:name', controlsRoute)
 .get('/genre/:name', genreRoute)
 .get('/combined/:name', combinedRoute)
@@ -125,7 +130,9 @@ app.get('/', function(req, res){
 .get('/trigger/:genre/:note', async function(req, res){
   let icons = await getIcon(req.params.note);
   res.render('touch-socket', {note: req.params.note, icons: icons, genre: req.params.genre});
-});
+})
+.get('/send/:song', showNumberForm)
+.post('/send/:song', sendSongTwilio);
 app.use(express.static('assets')); //display background
 // app.use(soundRouter);
 

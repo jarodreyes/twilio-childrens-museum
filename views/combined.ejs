@@ -12,6 +12,8 @@
   <script type="text/javascript" src="/js/Tone.js"></script>
   <script type="text/javascript" src="/js/socket.io.slim.js"></script>
   <script type="text/javascript" src="/js/socket.js"></script>
+  <script type="text/javascript" src="/js/tonePlayer.js"></script>
+  <script type="text/javascript" src="/js/Recorder.js"></script>
   
 
 
@@ -19,10 +21,7 @@
 <body class="vbox viewport">
   <h1 id="log">Hello</h1>
   <a href="#" id="play" class="button">Play</a>
-  <audio controls download></audio>
   <h2>All the songs..........</h2>
-
-  
 </body>
 
 <script>
@@ -30,71 +29,38 @@
   const genre = `<%- genre %>`;
   const audio = document.querySelector('audio');
   const beat = genre == 'HipHop' ? 'drum_beat' : 'conga_jungle';
+  let tapeMachine;
+  let player = new TonePlayer(notes);
 
-  //set the transport
+
   Tone.Transport.bpm.value = genre == 'HipHop' ? 90 : 100;
   Tone.Transport.loop = true;
   Tone.Transport.loopStart = 0;
   Tone.Transport.loopEnd = "4m";
 
-  const chunks = [];
-  const actx = Tone.context;
-  const dest  = actx.createMediaStreamDestination();
-  const recorder = new MediaRecorder(dest.stream);
-
-  recorder.ondataavailable = evt => {
-    chunks.push(evt.data);
-  }
-  recorder.onstop = evt => {
-    socket.emit('end_song');
-    let blob = new Blob(chunks, { type: 'audio/webm' });
-    audio.src = URL.createObjectURL(blob);
-    sendAudio(blob, evt.target.stream.id);
-  };
-
   const logStuff = (msg) => {
     $('#log').text(msg);
   }
 
-  const kickOffRecording = () => {
-    recorder.start();
-    setTimeout(() => {
-      recorder.stop();
-    }, 42000);
+  const kickOffRecording = async () => {
+      tapeMachine = new Recorder(socket, Tone);
+      await player.connectStream(tapeMachine.getStream());
+      return tapeMachine.start();
   }
 
-  const startSong = () => {
+  const startSong = async () => {
+    await kickOffRecording();
     Tone.Transport.start();
-    window[beat].mute = false;
+    player.playNote(beat);
     console.log('Starting Song!');
-    kickOffRecording();
   }
 
-  const resetSong = () => {
+  const resetSong = async() => {
     Tone.Transport.stop();
-    window[beat].mute = true;
+    player.stopNote(beat);
+    await player.disconnectStream(tapeMachine.getStream())
     logStuff('RESET');
-    chunks = [];
-  }
-
-  const success = (data) => {
-    console.log(data);
-    console.log('success!')
-  }
-
-  const sendAudio = (blob, id) => {
-    let formdata = new FormData();
-    formdata.append('soundBlob', blob,  `${id}.webm`);
-    $.ajax({
-      type: "POST",
-      url: '/upload',
-      enctype: 'multipart/form-data',
-      data: formdata,
-      success: success,
-      cache: false,
-      contentType: false,
-      processData: false
-    });
+    tapeMachine.stop()
   }
 
   StartAudioContext(Tone.context._context, '#play').then(function(){
@@ -102,16 +68,6 @@
     logStuff('context started');
     // startSong()
   })
-
-  for (var i=0; i<notes.length; i++) {
-    window[notes[i]] = new Tone.Player({
-      url: `/audio/${genre}/${notes[i]}.mp3`,
-      loop: true,
-      mute: true,
-      fadeIn: '8n'
-    }).connect(dest).toMaster().sync().start(0);
-  }
-
 
   $(document).ready(function () {
     setTimeout(() => {
@@ -127,7 +83,11 @@
       socket.on('play_sound', (msg) => {
         logStuff(`${msg.note}: ${msg.action}`);
         console.log(msg);
-        window[msg.note].mute = msg.action == 'stop';
+        if (msg.action == 'stop') {
+          player.stopNote(msg.note)
+        } else {
+          player.playNote(msg.note)
+        }
       })
 
     }, 1000)

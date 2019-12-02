@@ -99,6 +99,10 @@ html, body, .viewport {
             bottom:0px;
         }
     }
+    &.qrcode {
+        z-index:1000;
+        bottom:100vh;
+    }
     img {
         -webkit-filter: invert(1);
         filter: invert(1);

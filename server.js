@@ -33,22 +33,36 @@ app.use(sassMiddleware({
     prefix:  '/css'  // Where prefix is at <link rel="stylesheets" href="prefix/style.css"/>
 }));
 
+// streaming file
+const ss = require('socket.io-stream');
+
 io.on('connection', function (socket) {
     console.log('Socket connected')
     socket.on('trigger_sound', (msg) => {
       console.log(msg.action);
       io.emit('play_sound', msg);
-      io.emit('start_song', msg);
     });
 
     socket.on('trigger_song', function (msg) {
-        console.log(`Start: ${msg}`);
+        console.log(`Start: ${msg.action}`);
         io.emit('start_song', msg);
     });
     socket.on('disconnect', function () {
         console.log('user disconnected');
     });
+    socket.on('end_song', function () {
+        console.log(`Ending`);
+        io.emit('reset_players');
+    });
+
+    ss(socket).on('file', function(stream) {
+      console.log('FILE EMITTED');
+      fs.createWriteStream('test-song.webm').pipe(stream);
+    });
 });
+
+
+
 
 const genreRoute = async (req, res) => {
   let notes = await getNotes(`./assets/audio/${req.params.name}/`);
@@ -81,6 +95,19 @@ app.set('etag', false)
 app.use((req, res, next) => {
   res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
   next()
+})
+
+const multer  = require('multer') 
+const upload = multer();
+
+app.post('/upload', upload.single('soundBlob'), function (req, res, next) {
+  console.log(req.file); // see what got uploaded
+
+  let uploadLocation = __dirname + '/assets/' + req.file.originalname // where to save the file to. make sure the incoming name has a .wav extension
+
+  fs.writeFileSync(uploadLocation, Buffer.from(new Uint8Array(req.file.buffer))); // write the blob to the server as a file
+  res.sendStatus(200); //send back that everything went ok
+
 })
 
 //serve up pad.html

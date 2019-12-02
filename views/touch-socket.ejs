@@ -11,14 +11,17 @@
 </head>
 <body class="vbox viewport">
   <div id="log"></div>
-  <div class="action <%= note[0] %>">
+  <div class="card start live">
+    <div class='logo'></div>
+    <a class="play-button-outer">
+      <div class="play-button"></div>
+    </a>
+  </div>
+  <div class="card action <%= note[7] %>">
     <% icons.forEach(function(icon) { %>
       <div class="media">
         <img src="<%=icon%>" >
       </div>
-    <% }) %>
-    <% note.split('_').forEach(function(n) { %>
-      <h2><%= n %></h2>
     <% }) %>
   </div>
   <div class="accent"></div>
@@ -35,7 +38,15 @@
         name;
 
     const addHighlight = (state) => {
-        $('.action').toggleClass('live')
+        $('.action').toggleClass('live');
+    }
+
+    const revealInstrument = (state) => {
+        $('.start').removeClass('live');
+    }
+
+    const resetSong = () => {
+        $('.start').addClass('live');
     }
 
     $(document).ready(function() {
@@ -53,6 +64,18 @@
           addHighlight(false);
         }
       });
+
+      $('.start').on('click', function(e) {
+          socket.emit('trigger_song', {note: note, action: 'start'});
+          
+      })
+
+      socket.on('reset_players', (msg) => {
+        resetSong()
+      });
+      socket.on('start_song', () => {
+        revealInstrument();
+      })
       
     });
   </script>

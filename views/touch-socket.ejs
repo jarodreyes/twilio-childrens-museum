@@ -7,6 +7,7 @@
   <link rel="apple-touch-icon" sizes="114x114" href="/img/favicon_114.png"/>
   <title>NCM & Twilio</title>
   <link rel="stylesheet" href="/css/bell.css">
+  
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 </head>
 <body class="vbox viewport">
@@ -25,7 +26,17 @@
     <% }) %>
   </div>
   <div class="card qrcode">
+    <h3>Download your kids song now!</h3>
     <canvas id="canvas"></canvas>
+    <img src="<%=camera[0]%>" >
+  </div>
+  <div class="card loading">
+    <div class="loader">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <h2>Saving Song...</h2>
   </div>
   <div class="accent"></div>
 
@@ -34,10 +45,6 @@
   <script src="/js/bell.js"></script>
   <script src="/js/qrcode.min.js"></script>
   <script>
-  QRCode.toCanvas(document.getElementById('canvas'), 'http://jreyes.ngrok.io/send/test', function (error) {
-    if (error) console.error(error)
-    console.log('success!');
-  })
   </script> 
 
   <script type="text/javascript">
@@ -57,8 +64,27 @@
         $('.start').removeClass('live');
     }
 
+    const showLoading = (state) => {
+        $('.loading').addClass('live');
+    }
+
+    const showQrCode = (fileName) => {
+        console.log(fileName.replace(/\.[^/.]+$/, ""))
+
+        QRCode.toCanvas(document.getElementById('canvas'), `https://jreyes.ngrok.io/send/${fileName.replace(/\.[^/.]+$/, "")}`, function (error) {
+            if (error) console.error(error)
+            console.log('success!');
+        })
+        $('.qrcode').addClass('live');
+        setTimeout(()=> {
+          socket.emit('reset_song');
+        }, 12000)
+    }
+
     const resetSong = () => {
         $('.action').removeClass('live');
+        $('.loading').removeClass('live');
+        $('.qrcode').removeClass('live');
         $('.start').addClass('live');
         action = 'start';
         playing = false;
@@ -90,6 +116,17 @@
       socket.on('reset_players', (msg) => {
         resetSong()
       });
+
+      socket.on('await_upload', (msg) => {
+        console.log('SHOWING LOADER')
+        showLoading()
+      });
+
+      socket.on('show_code', (msg) => {
+        console.log('SHOWING CODE')
+        showQrCode(msg.file)
+      });
+
       socket.on('start_song', () => {
         revealInstrument();
       })

@@ -4,6 +4,46 @@ const nounProject = new NounProject({
     key: process.env.NOUN_PROJECT_KEY,
     secret: process.env.NOUN_PROJECT_SECRET
 });
+const awsBucket = process.env.AWS_NCM_BUCKET;
+
+const s3 = require('s3');
+ 
+const client = s3.createClient({
+  maxAsyncS3: 20,     // this is the default
+  s3RetryCount: 3,    // this is the default
+  s3RetryDelay: 1000, // this is the default
+  multipartUploadThreshold: 20971520, // this is the default (20 MB)
+  multipartUploadSize: 15728640, // this is the default (15 MB)
+  s3Options: {
+    accessKeyId: process.env.AWS_ACCESS_KEY,
+    secretAccessKey: process.env.AWS_SECRET,
+    // any other options are passed to new AWS.S3()
+    // See: http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property
+  },
+});
+
+const uploadToS3 = async (args) => {
+    var params = {
+        localFile: `${args.localFile}`,
+        s3Params: {
+            Bucket: awsBucket,
+            Key: args.fileName,
+        },
+    };
+    var uploader = client.uploadFile(params);
+    uploader.on('error', function(err) {
+        console.error("unable to upload:", err.stack);
+        return false;
+    });
+    uploader.on('progress', function() {
+        console.log("progress", uploader.progressMd5Amount,
+            uploader.progressAmount, uploader.progressTotal);
+    });
+    uploader.on('end', function() {
+        console.log("done uploading");
+        return true;
+    });
+}
 
 // Get list of available notes from asset folder
 const getNotesFromDirectory = (dir) => {
@@ -59,6 +99,7 @@ const getIconFromNote = async (note) => {
 }
 
 module.exports = {
-  getNotes : getNotesFromDirectory,
-  getIcon : getIconFromNote
+    uploadToS3: uploadToS3,
+    getNotes : getNotesFromDirectory,
+    getIcon : getIconFromNote
 };

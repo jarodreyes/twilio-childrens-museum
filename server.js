@@ -2,7 +2,7 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const sassMiddleware = require('node-sass-middleware');
-const fs = require('fs')
+const fs = require('fs');
 const path = require('path');
 const _ = require('underscore');
 const urllib = require('urllib');
@@ -17,6 +17,7 @@ require('dotenv').load();
 const baseURL = process.env.BASE_URL;
 const getNotes = require('./operations/utilities').getNotes
 const getIcon = require('./operations/utilities').getIcon
+const uploadToS3 = require('./operations/utilities').uploadToS3
 // For uploading
 const multer  = require('multer') 
 const upload = multer();
@@ -57,7 +58,11 @@ io.on('connection', function (socket) {
     });
 
     socket.on('end_song', function () {
-        console.log(`Ending`);
+        console.log(`Ending song, showing loader`);
+        io.emit('await_upload');
+    });
+    socket.on('reset_song', function () {
+        console.log(`Resetting Song`);
         io.emit('reset_players');
     });
 });
@@ -86,8 +91,8 @@ const showNumberForm = async (req, res) => {
 
 const sendSongTwilio = async (req, res) => {
   console.log(req.body.phone);
-  // let songUrl = `https://jreyes.ngrok.io/songs/${req.params.song}.wav`
-  let songUrl = 'https://jardiohead.s3-us-west-1.amazonaws.com/1990s.mp3'
+  let songUrl = `https://ncm-audio-converted.s3.amazonaws.com/${req.params.song}.mp3`
+  // let songUrl = 'https://ncm-audio-converted.s3.amazonaws.com/330e63d4-8a52-4bf1-8737-820ca6080274.mp3'
   twilio.messages.create({
     'to': '+12066505813',
     'from': process.env.TWILIO_NUMBER,
@@ -105,12 +110,18 @@ app.use((req, res, next) => {
   next()
 })
 
-const saveAudio = (req, res, next) => {
+const saveAudio = async (req, res, next) => {
   console.log(req.file); // see what got uploaded
 
   let uploadLocation = __dirname + '/assets/songs/' + req.file.originalname // where to save the file to. make sure the incoming name has a .wav extension
 
-  fs.writeFileSync(uploadLocation, Buffer.from(new Uint8Array(req.file.buffer))); // write the blob to the server as a file
+  let save = await fs.writeFileSync(uploadLocation, Buffer.from(new Uint8Array(req.file.buffer))); // write the blob to the server as a file
+  let uploaded = await uploadToS3({
+      localFile: uploadLocation,
+      fileName: req.file.originalname
+  });
+  console.log(`Upload: ${uploaded}`)
+  io.emit('show_code', {file: req.file.originalname});
   res.sendStatus(200); //send back that everything went ok
 
 }
@@ -129,7 +140,8 @@ app.get('/', function(req, res){
 })
 .get('/trigger/:genre/:note', async function(req, res){
   let icons = await getIcon(req.params.note);
-  res.render('touch-socket', {note: req.params.note, icons: icons, genre: req.params.genre});
+  let camera = await getIcon('camera');
+  res.render('touch-socket', {note: req.params.note, icons: icons, genre: req.params.genre, camera: camera});
 })
 .get('/send/:song', showNumberForm)
 .post('/send/:song', sendSongTwilio);

@@ -7,6 +7,9 @@
   <link rel="apple-touch-icon" sizes="114x114" href="/img/favicon_114.png"/>
   <title>NCM & Twilio</title>
   <link rel="stylesheet" href="/css/bell.css">
+  <link rel="stylesheet" href="https://unpkg.com/mobi.css/dist/mobi.min.css">
+  <!-- Add plugins as you like -->
+  <link rel="stylesheet" href="https://unpkg.com/mobi-plugin-color/dist/mobi-plugin-color.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
   <script type="text/javascript" src="/js/StartAudioContext.js"></script>
   <script type="text/javascript" src="/js/Tone.js"></script>
@@ -18,10 +21,22 @@
 
 
 </head>
-<body class="vbox viewport">
-  <h1 id="log">Hello</h1>
-  <a href="#" id="play" class="button">Play</a>
-  <h2>All the songs..........</h2>
+<body class="vbox viewport flex-center">
+  <div class="container">
+    <h1 id="log">Hello</h1>
+    <a href="#" id="play" class="button">Play</a>
+    <h2>All the songs..........</h2>
+    <div class="flex-left units-gap">
+    <label class="unit-1-3 text-right" style="width:85px;">Number of Bars: </label>
+    <div class="unit-1">
+      <select>
+        <option>8</option>
+        <option selected value>16</option>
+        <option>24</option>
+        <option>32</option>
+        <option>64</option>
+      </select>
+    </div>
 </body>
 
 <script>
@@ -29,6 +44,10 @@
   const genre = `<%- genre %>`;
   const audio = document.querySelector('audio');
   const beat = genre == 'HipHop' ? 'drum_beat' : 'conga_jungle';
+  // 16 bars
+  let bars = 16;
+  const barLength = genre == 'HipHop' ? 2670 : 2400;
+  const songLength = barLength * bars;
   let tapeMachine;
   let player = new TonePlayer(notes);
 
@@ -43,7 +62,7 @@
   }
 
   const kickOffRecording = async () => {
-      tapeMachine = new Recorder(socket, Tone);
+      tapeMachine = new Recorder(socket, Tone, songLength);
       await player.connectStream(tapeMachine.getStream());
       return tapeMachine.start();
   }
@@ -76,7 +95,7 @@
         startSong();
       })
 
-      socket.on('reset_players', () => {
+      socket.on('await_upload', () => {
         resetSong();
       })
 
@@ -89,6 +108,11 @@
           player.playNote(msg.note)
         }
       })
+
+      $('select').on('change', function() {
+        bars = this.value;
+        console.log(bars);
+      });
 
     }, 1000)
   });

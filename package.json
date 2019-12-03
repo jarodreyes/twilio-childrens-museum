@@ -18,7 +18,6 @@
   "author": "lizzie, jarod, devin, ricky, andres",
   "license": "ISC",
   "dependencies": {
-    "aws-s3": "2.0.5",
     "biguint-format": "1.0.1",
     "body-parser": "1.19.0",
     "cb": "^0.1.0",
@@ -33,7 +32,6 @@
     "jsdom": "12.2.0",
     "mocha": "^5.2.0",
     "multer": "1.4.2",
-    "node-lame": "1.2.0",
     "node-sass": "4.12.0",
     "node-sass-middleware": "^0.11.0",
     "nodemon": "1.19.4",
@@ -41,6 +39,7 @@
     "qrcode": "1.4.4",
     "querystring": "^0.2.0",
     "request": "^2.88.0",
+    "s3": "4.4.0",
     "socket.io": "2.2.0",
     "startaudiocontext": "1.2.1",
     "the-noun-project": "2.1.0",

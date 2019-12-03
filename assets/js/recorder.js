@@ -1,8 +1,8 @@
 class Recorder {
-    constructor(socket, Tone) {
+    constructor(socket, Tone, songLength) {
         // defaults
         console.log('Recorder created')
-        this.songLength = 15000;
+        this.songLength = songLength;
         this.socket = socket;
         this.sent = '';
         //set the transport

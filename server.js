@@ -11,7 +11,7 @@ const app = express();
 // socket io
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
-// const soundRouter = require('./routers/sound-router');
+const secureRouter = require('./routers/secureRouter');
 var request = require('request');
 require('dotenv').load();
 const baseURL = process.env.BASE_URL;
@@ -125,6 +125,9 @@ const saveAudio = async (req, res, next) => {
   res.sendStatus(200); //send back that everything went ok
 
 }
+
+app.use('/secure', secureRouter)
+secureRouter.get('/play/:name', combinedRoute) 
 
 //serve up pad.html
 app.get('/', function(req, res){

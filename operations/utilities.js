@@ -23,6 +23,7 @@ const client = s3.createClient({
 });
 
 const uploadToS3 = async (args) => {
+    console.log(`ATTEMPTING UPLOAD TO S3: ${args.localFile}`)
     try {
         var params = {
             localFile: `${args.localFile}`,

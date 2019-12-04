@@ -1,5 +1,4 @@
 const fs = require('fs');
-const mfs = require('memfs');
 const NounProject = require('the-noun-project');
 const nounProject = new NounProject({
     key: process.env.NOUN_PROJECT_KEY,

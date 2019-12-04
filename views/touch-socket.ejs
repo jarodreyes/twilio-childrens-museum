@@ -71,7 +71,7 @@
     const showQrCode = (fileName) => {
         console.log(fileName.replace(/\.[^/.]+$/, ""))
 
-        QRCode.toCanvas(document.getElementById('canvas'), `https://jreyes.ngrok.io/send/${fileName.replace(/\.[^/.]+$/, "")}`, function (error) {
+        QRCode.toCanvas(document.getElementById('canvas'), `${window.location.hostname}/send/${fileName.replace(/\.[^/.]+$/, "")}`, function (error) {
             if (error) console.error(error)
             console.log('success!');
         })

@@ -117,6 +117,10 @@
         resetSong()
       });
 
+      socket.on('reload_window', (msg) => {
+        location.reload();
+      });
+
       socket.on('await_upload', (msg) => {
         console.log('SHOWING LOADER')
         showLoading()

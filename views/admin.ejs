@@ -1,0 +1,23 @@
+<%- include('header') -%>
+<body >
+    <a id="reload" href="#" class="button--large--cta" style="width: 95%; margin: 20px auto;">Reload Phones</a>
+    <a id="loadHip" href="#" class="button--large--cta" style="width: 95%; margin: 20px auto;">Load Hip Hop Phones</a>
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/socket.io.slim.js"></script>
+  <script type="text/javascript" src="/js/socket.js"></script>
+  <script type="text/javascript">
+
+    const triggerReset = () => {
+      socket.emit('reset_phones');
+    }
+
+    $(document).ready(function() {
+        $('#reload').click((evt)=> {
+            triggerReset()
+        })  
+    });
+  </script>
+</body>
+</html>

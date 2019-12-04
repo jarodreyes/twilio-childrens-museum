@@ -65,6 +65,10 @@ io.on('connection', function (socket) {
         console.log(`Resetting Song`);
         io.emit('reset_players');
     });
+
+    socket.on('reset_phones', ()=> {
+        io.emit('reload_window');
+    })
 });
 
 
@@ -125,6 +129,9 @@ const saveAudio = async (req, res, next) => {
 
 app.use('/secure', secureRouter)
 secureRouter.get('/play/:name', combinedRoute) 
+secureRouter.get('/admin', async function(req, res){
+  res.render('admin');
+}) 
 
 //serve up pad.html
 app.get('/', function(req, res){

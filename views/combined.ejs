@@ -27,16 +27,18 @@
     <a href="#" id="play" class="button">Play</a>
     <h2>All the songs..........</h2>
     <div class="flex-left units-gap">
-    <label class="unit-1-3 text-right" style="width:85px;">Number of Bars: </label>
-    <div class="unit-1">
-      <select>
-        <option>8</option>
-        <option selected value>16</option>
-        <option>24</option>
-        <option>32</option>
-        <option>64</option>
-      </select>
+      <label class="unit-1-3 text-right" style="width:85px;">Number of Bars: </label>
+      <div class="unit-1">
+        <select>
+          <option>8</option>
+          <option selected value>16</option>
+          <option>24</option>
+          <option>32</option>
+          <option>64</option>
+        </select>
+      </div>
     </div>
+  </div>
 </body>
 
 <script>
@@ -76,7 +78,7 @@
 
   const resetSong = async() => {
     Tone.Transport.stop();
-    player.stopNote(beat);
+    player.resetSong();
     await player.disconnectStream(tapeMachine.getStream())
     logStuff('RESET');
     tapeMachine.stop()

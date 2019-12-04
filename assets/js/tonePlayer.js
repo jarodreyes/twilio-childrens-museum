@@ -51,6 +51,18 @@ class TonePlayer {
         this.players.toMaster();
     }
 
+    mutePlayers() {
+        console.log('mutingplayers')
+        const keys = Object.keys(this.notes)
+        for (const key of keys) {
+            console.log(key);
+            let p = this.players.get(key);
+            p.mute = true;
+        }
+        return 'ok'
+    }
+
+
     connectStream = async(stream) => {
         return this.players.connect(stream);
     }
@@ -62,6 +74,10 @@ class TonePlayer {
     playNote(note) {
         let n = this.players.get(note);
         n.mute = false;
+    }
+
+    resetSong() {
+        this.mutePlayers()
     }
 
     stopNote(note) {

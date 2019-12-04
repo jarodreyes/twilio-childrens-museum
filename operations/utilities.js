@@ -23,26 +23,32 @@ const client = s3.createClient({
 });
 
 const uploadToS3 = async (args) => {
-    var params = {
-        localFile: `${args.localFile}`,
-        s3Params: {
-            Bucket: awsBucket,
-            Key: args.fileName,
-        },
-    };
-    var uploader = client.uploadFile(params);
-    uploader.on('error', function(err) {
-        console.error("unable to upload:", err.stack);
-        return false;
-    });
-    uploader.on('progress', function() {
-        console.log("progress", uploader.progressMd5Amount,
-            uploader.progressAmount, uploader.progressTotal);
-    });
-    uploader.on('end', function() {
-        console.log("done uploading");
-        return true;
-    });
+    try {
+        var params = {
+            localFile: `${args.localFile}`,
+            s3Params: {
+                Bucket: awsBucket,
+                Key: args.fileName,
+            },
+        };
+        var uploader = client.uploadFile(params);
+        uploader.on('error', function(err) {
+            console.error("unable to upload:", err.stack);
+            return false;
+        });
+        uploader.on('progress', function() {
+            console.log("progress", uploader.progressMd5Amount,
+                uploader.progressAmount, uploader.progressTotal);
+        });
+        uploader.on('end', function() {
+            console.log("done uploading");
+            return true;
+        });
+    } catch(e) {
+        // statements
+        console.log(e);
+    }
+    
 }
 
 // Get list of available notes from asset folder

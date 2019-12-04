@@ -115,11 +115,11 @@ const saveAudio = async (req, res, next) => {
 
   let uploadLocation = __dirname + '/assets/songs/' + req.file.originalname // where to save the file to. make sure the incoming name has a .wav extension
 
-  let save = await fs.writeFileSync(uploadLocation, Buffer.from(new Uint8Array(req.file.buffer))); // write the blob to the server as a file
+  let save = await fs.writeFileSync(uploadLocation, Buffer.from(new Uint8Array(req.file.buffer)))
   let uploaded = await uploadToS3({
       localFile: uploadLocation,
       fileName: req.file.originalname
-  });
+  })
   console.log(`Upload: ${uploaded}`)
   io.emit('show_code', {file: req.file.originalname});
   res.sendStatus(200); //send back that everything went ok

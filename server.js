@@ -2,7 +2,7 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const sassMiddleware = require('node-sass-middleware');
-const fs = require('fs');
+const fs = require('memfs');
 const path = require('path');
 const _ = require('underscore');
 const urllib = require('urllib');
@@ -111,13 +111,10 @@ app.use((req, res, next) => {
 })
 
 const saveAudio = async (req, res, next) => {
-  console.log(req.file); // see what got uploaded
-
-  let uploadLocation = __dirname + '/assets/songs/' + req.file.originalname // where to save the file to. make sure the incoming name has a .wav extension
-
-  let save = await fs.writeFileSync(uploadLocation, Buffer.from(new Uint8Array(req.file.buffer)))
+  console.log(req.file.originalname); // see what got uploaded
+  let fileBuffer = Buffer.from(new Uint8Array(req.file.buffer))
   let uploaded = await uploadToS3({
-      localFile: uploadLocation,
+      fileBuffer: fileBuffer,
       fileName: req.file.originalname
   })
   console.log(`Upload: ${uploaded}`)

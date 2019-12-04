@@ -1,4 +1,4 @@
-const socket = io('http://jreyes.ngrok.io');
+const socket = io();
 
 
 socket.on('reconnect_attempt', () => {

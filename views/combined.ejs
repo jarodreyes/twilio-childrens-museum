@@ -110,8 +110,10 @@
       })
 
       $('select').on('change', function() {
+        console.log(bars, songLength);
         bars = this.value;
-        console.log(bars);
+        songLength = barLength * bars;
+        console.log(bars, songLength);
       });
 
     }, 1000)

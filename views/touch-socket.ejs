@@ -28,7 +28,7 @@
   <div class="card qrcode">
     <h3>Download your kids song now!</h3>
     <canvas id="canvas"></canvas>
-    <img src="<%=camera[0]%>" >
+    <img src="/img/camera.png" >
   </div>
   <div class="card loading">
     <div class="loader">
@@ -50,6 +50,8 @@
   <script type="text/javascript">
     const note = `<%- note %>`;
     const genre = `<%- genre %>`;
+    const position = `<%- position %>`;
+
     let audioStream, 
         handbell,
         playing,
@@ -117,9 +119,15 @@
         resetSong()
       });
 
-      socket.on('reload_window', (msg) => {
-        location.reload();
+      socket.on('load_window', (msg) => {
+        if (msg && msg.path) {
+          window.location = `/phone/${msg.path}/${position}`;
+        }
       });
+
+      socket.on('reload_window', ()=> {
+          location.reload();
+      })
 
       socket.on('await_upload', (msg) => {
         console.log('SHOWING LOADER')

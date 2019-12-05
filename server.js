@@ -16,6 +16,7 @@ var request = require('request');
 require('dotenv').load();
 const baseURL = process.env.BASE_URL;
 const getNotes = require('./operations/utilities').getNotes
+const getNotePosition = require('./operations/utilities').getNotePosition
 const getIcon = require('./operations/utilities').getIcon
 const uploadToS3 = require('./operations/utilities').uploadToS3
 // For uploading
@@ -61,6 +62,11 @@ io.on('connection', function (socket) {
         console.log(`Ending song, showing loader`);
         io.emit('await_upload');
     });
+
+    socket.on('song_length', (msg) => {
+        io.emit('song_length', {bars: msg.bars});
+    });
+
     socket.on('reset_song', function () {
         console.log(`Resetting Song`);
         io.emit('reset_players');
@@ -69,10 +75,12 @@ io.on('connection', function (socket) {
     socket.on('reset_phones', ()=> {
         io.emit('reload_window');
     })
+
+    socket.on('load_phones', (msg)=> {
+        console.log(`loading ${msg}`);
+        io.emit('load_window', {path: msg.path});
+    })
 });
-
-
-
 
 const genreRoute = async (req, res) => {
   let notes = await getNotes(`./assets/audio/${req.params.name}/`);
@@ -108,6 +116,21 @@ const sendSongTwilio = async (req, res) => {
   });
 }
 
+const sendAdminAlert = async(msg) => {
+  console.log('attempting to send admin alert.')
+  await twilio.messages.create({
+    'to': '+12066505813',
+    'from': '+19138285268',
+    'body': `Something's gone wrong, check the ncm app here: http://ncm-play.herokuapp.com/secure/admin`
+  }).then((message) => {
+    console.log(message.sid)
+    return message.sid;
+  }).catch((err) => {
+    console.log(err)
+    return err;
+  });
+}
+
 app.set('etag', false)
 app.use((req, res, next) => {
   res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
@@ -140,6 +163,9 @@ app.get('/', function(req, res){
 .post('/upload', upload.single('soundBlob'), saveAudio)
 .get('/controls/:name', controlsRoute)
 .get('/genre/:name', genreRoute)
+.get('/phones', (req, res) => {
+  res.render('list', {notes: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], genre: 'world'});
+})
 .get('/combined/:name', combinedRoute)
 .get('/sound/:genre/:note', async function(req, res){
   let icons = await getIcon(req.params.note);
@@ -150,6 +176,11 @@ app.get('/', function(req, res){
   let camera = await getIcon('camera');
   res.render('touch-socket', {note: req.params.note, icons: icons, genre: req.params.genre, camera: camera});
 })
+.get('/phone/:genre/:position', async function(req, res){
+  let note = await getNotePosition(req.params.genre, req.params.position)
+  let icons = await getIcon(note)
+  res.render('touch-socket', {note: note, icons: icons, genre: req.params.genre, position: req.params.position});
+})
 .get('/send/:song', showNumberForm)
 .post('/send/:song', sendSongTwilio);
 app.use(express.static('assets')); //display background
@@ -158,7 +189,9 @@ app.use(express.static('assets')); //display background
 // Cleanup
 process.stdin.resume();//so the program will not close instantly
 
-function exitHandler(options, exitCode) {
+const exitHandler = async(options, exitCode) => {
+    let msg = exitCode != undefined ? exitCode : 'no exit code';
+    await sendAdminAlert(msg);
     if (options.cleanup) console.log('clean');
     if (exitCode || exitCode === 0) console.log(exitCode);
     if (options.exit) process.exit();
@@ -176,11 +209,9 @@ process.on('SIGINT', exitHandler.bind(null, {exit:true}));
 
 //catches uncaught exceptions
 process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
-
 http.listen(app.get('port'), function () {
     console.log(`NCM live on port: ${app.get('port')}`);
 });
- 
 module.exports = {
   verbose: true,
   app : app,

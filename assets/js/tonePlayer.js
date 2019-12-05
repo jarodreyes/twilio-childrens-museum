@@ -51,15 +51,20 @@ class TonePlayer {
         this.players.toMaster();
     }
 
-    mutePlayers() {
-        console.log('mutingplayers')
-        const keys = Object.keys(this.notes)
+    resetSong = async() => {
+        console.log('RESETTING SONG!')
+        let promises = []
+        const keys = Object.keys(this.notes);
         for (const key of keys) {
-            console.log(key);
-            let p = this.players.get(key);
-            p.mute = true;
+            promises.push(
+                new Promise((resolve, reject) => {
+                    console.log(console.log(`resolving ${key}`))
+                    resolve(this.stopNote(key))
+                })
+            )
         }
-        return 'ok'
+
+        return Promise.all(promises)
     }
 
 
@@ -74,10 +79,6 @@ class TonePlayer {
     playNote(note) {
         let n = this.players.get(note);
         n.mute = false;
-    }
-
-    resetSong() {
-        this.mutePlayers()
     }
 
     stopNote(note) {

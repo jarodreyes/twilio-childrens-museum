@@ -1,0 +1,29 @@
+{
+    "hiphop": [
+        "bass_guitar_hiphop", 
+        "bells_vibraphone",
+        "chords_layers",
+        "chords_warehouse",
+        "disco_guitar",
+        "harp_city",
+        "hiphop_drum_vinyl",
+        "lounge_guitar_rope",
+        "mind_piano",
+        "synth_air",
+        "violin_cello",
+        "voice_singer_robot"],
+    "world": [
+        "acoustic_guitar_calm",
+        "bass_retro_garbage",
+        "chinese_traditional",
+        "conga_jungle",
+        "cuban_guitar",
+        "egypt_drum",
+        "egypt_drum_two",
+        "gospel_saxophone",
+        "jamaican_bass_mellow",
+        "jamaican_guitar",
+        "japan_numbers",
+        "jazz_flute_cat"
+    ]
+}

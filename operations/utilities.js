@@ -1,4 +1,5 @@
 const fs = require('fs');
+const idealNotes = require('../lib/notes.json')
 const NounProject = require('the-noun-project');
 const nounProject = new NounProject({
     key: process.env.NOUN_PROJECT_KEY,
@@ -12,18 +13,6 @@ var client = new AWS.S3({
     accessKeyId: process.env.AWS_ACCESS_KEY,
     secretAccessKey: process.env.AWS_SECRET
 });
-// const client = s3.createClient({
-//   maxAsyncS3: 20,     // this is the default
-//   s3RetryCount: 3,    // this is the default
-//   s3RetryDelay: 1000, // this is the default
-//   multipartUploadThreshold: 20971520, // this is the default (20 MB)
-//   multipartUploadSize: 15728640, // this is the default (15 MB)
-//   s3Options: {
-    
-//     // any other options are passed to new AWS.S3()
-//     // See: http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property
-//   },
-// });
 
 const uploadToS3 = async (args) => {
     // console.log(`ATTEMPTING UPLOAD TO S3: ${args.fileBuffer}`)
@@ -73,6 +62,20 @@ const getNotesFromDirectory = (dir) => {
   });
 }
 
+
+// Get list of available notes from asset folder
+const getNoteFromPosition = (genre, position) => {
+  return new Promise((resolve, reject) => {
+      try {
+        let note = idealNotes[genre.toLowerCase()][parseInt(position)];
+        resolve(note)
+      } catch (e) {
+        reject(e);
+      }
+  });
+}
+
+
 const getIconsFromApi = (word) => {
     return new Promise((resolve, reject) => {
         nounProject.getIconsByTerm(word, {limit: 5}, function (err, data) {
@@ -101,5 +104,6 @@ const getIconFromNote = async (note) => {
 module.exports = {
     uploadToS3: uploadToS3,
     getNotes : getNotesFromDirectory,
-    getIcon : getIconFromNote
+    getIcon : getIconFromNote,
+    getNotePosition: getNoteFromPosition
 };

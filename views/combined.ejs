@@ -29,12 +29,12 @@
     <div class="flex-left units-gap">
       <label class="unit-1-3 text-right" style="width:85px;">Number of Bars: </label>
       <div class="unit-1">
-        <select>
-          <option>8</option>
-          <option selected>16</option>
-          <option>24</option>
-          <option>32</option>
-          <option>64</option>
+        <select id="bars">
+          <option id="8">8</option>
+          <option id="16" selected>16</option>
+          <option id="24">24</option>
+          <option id="32">32</option>
+          <option id="64">64</option>
         </select>
       </div>
     </div>
@@ -45,16 +45,16 @@
   const notes = <%- JSON.stringify(notes) %>;
   const genre = `<%- genre %>`;
   const audio = document.querySelector('audio');
-  const beat = genre == 'HipHop' ? 'drum_beat' : 'conga_jungle';
+  const beat = genre == 'hiphop' ? 'drum_beat' : 'conga_jungle';
   // 16 bars
   let bars = 16;
-  const barLength = genre == 'HipHop' ? 2670 : 2400;
+  const barLength = genre == 'hiphop' ? 2670 : 2400;
   let songLength = barLength * bars;
   let tapeMachine;
   let player = new TonePlayer(notes);
 
 
-  Tone.Transport.bpm.value = genre == 'HipHop' ? 90 : 100;
+  Tone.Transport.bpm.value = genre == 'hiphop' ? 90 : 100;
   Tone.Transport.loop = true;
   Tone.Transport.loopStart = 0;
   Tone.Transport.loopEnd = "4m";
@@ -77,11 +77,11 @@
   }
 
   const resetSong = async() => {
-    Tone.Transport.stop();
-    player.resetSong();
-    await player.disconnectStream(tapeMachine.getStream())
+    await player.resetSong();
+    await player.disconnectStream(tapeMachine.getStream());
     logStuff('RESET');
-    tapeMachine.stop()
+    tapeMachine.stop();
+    Tone.Transport.stop();
   }
 
   StartAudioContext(Tone.context._context, '#play').then(function(){
@@ -101,6 +101,13 @@
         resetSong();
       })
 
+      socket.on('song_length', (msg) => {
+        document.getElementById(msg.bars).selected = "true";
+        bars = msg.bars;
+        songLength = barLength * bars;
+        logStuff(`${msg.bars}: Song Length ${songLength}`)
+      })
+
       socket.on('play_sound', (msg) => {
         logStuff(`${msg.note}: ${msg.action}`);
         console.log(msg);
@@ -110,6 +117,12 @@
           player.playNote(msg.note)
         }
       })
+
+      socket.on('load_window', (msg) => {
+        if (msg && msg.path) {
+          window.location = `/secure/play/${msg.path}`;
+        }
+      });
 
       $('select').on('change', function() {
         console.log(bars, songLength);

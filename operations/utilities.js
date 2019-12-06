@@ -67,7 +67,8 @@ const getNotesFromDirectory = (dir) => {
 const getNoteFromPosition = (genre, position) => {
   return new Promise((resolve, reject) => {
       try {
-        let note = idealNotes[genre.toLowerCase()][parseInt(position)];
+        let pos = parseInt(position) - 1;
+        let note = idealNotes[genre.toLowerCase()][pos];
         resolve(note)
       } catch (e) {
         reject(e);

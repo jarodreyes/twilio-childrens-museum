@@ -102,17 +102,19 @@ const showNumberForm = async (req, res) => {
 }
 
 const sendSongTwilio = async (req, res) => {
-  console.log(req.body.phone);
+  let phone = req.body.phone
+  let email = req.body.email
+  console.log(phone, email)
   let songUrl = `https://ncm-audio-converted.s3.amazonaws.com/${req.params.song}.mp3`
   // let songUrl = 'https://ncm-audio-converted.s3.amazonaws.com/330e63d4-8a52-4bf1-8737-820ca6080274.mp3'
   twilio.messages.create({
-    'to': '+12066505813',
+    'to': phone,
     'from': process.env.TWILIO_NUMBER,
     'body': `Thank you for playing! Please enjoy the song your child recorded at: ${songUrl}`,
     'mediaUrl': songUrl
   }).then((message) => {
     console.log(message.sid);
-    res.send('ok')
+    res.redirect('/sent');
   });
 }
 
@@ -182,6 +184,9 @@ app.get('/', function(req, res){
   res.render('touch-socket', {note: note, icons: icons, genre: req.params.genre, position: req.params.position});
 })
 .get('/send/:song', showNumberForm)
+.get('/sent', (req, res)=> {
+  res.render('sent')
+})
 .post('/send/:song', sendSongTwilio);
 app.use(express.static('assets')); //display background
 // app.use(soundRouter);

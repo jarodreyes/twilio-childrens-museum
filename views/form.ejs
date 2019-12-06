@@ -1,13 +1,14 @@
 <%- include('header') -%>
-<form action="/send/<%=song%>" method="post" class="form top-gap-big">
-  <fieldset>
-    <legend>Get a link to your child's song!</legend>
-    <label>Phone Number</label>
-    <input type="text" name="phone" required placeholder="555-286-2862">
-    <label>Email</label>
-    <input type="email" name="email" placeholder="picasso@artlegends.com">
-    <button class="btn btn-primary btn-block">Submit</button>
-  </fieldset>
-</form>
+<body style="background-color:#f7f6f6;">
+	<form action="/send/<%=song%>" method="post" class="form top-gap-big">
+	  <fieldset>
+	    <legend>Get a link to your child's song!</legend>
+	    <label>Phone Number</label>
+	    <input type="text" name="phone" required placeholder="555-286-2862">
+	    <label>Email</label>
+	    <input type="email" name="email" placeholder="picasso@artlegends.com">
+	    <button class="btn btn-primary btn-block">Submit</button>
+	  </fieldset>
+	</form>
 </body>
 </html>

@@ -1,0 +1,32 @@
+{
+    "hiphop": [
+        "acoustic_slide",
+        "bass_guitar_hiphop",
+        "chords_warehouse",
+        "chorus_singer",
+        "fender_guitar_fingers",
+        "hiphop_drum_vinyl",
+        "lounge_guitar_fender",
+        "mind_piano",
+        "piano_clouds",
+        "star_keyboard",
+        "stutter_step_drum",
+        "synth_cake",
+        "vibraphone_book",
+        "violin_star",
+        "voice_singer_robot"],
+    "world": [
+        "acoustic_guitar_calm",
+        "bass_retro_garbage",
+        "chinese_traditional",
+        "conga_jungle",
+        "cuban_guitar",
+        "egypt_drum",
+        "egypt_drum_two",
+        "gospel_saxophone",
+        "jamaican_bass_mellow",
+        "jamaican_guitar",
+        "japan_numbers",
+        "jazz_flute_cat"
+    ]
+}

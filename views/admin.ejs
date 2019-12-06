@@ -3,7 +3,8 @@
     <a id="reload" href="#" class="button--large--cta admin"  style="width: 95%; margin: 20px auto;">Reload Phones</a>
     <a id="loadHip" href="#" class="button--large--cta admin" data-emit="hiphop" style="width: 95%; margin: 20px auto;">Load Hip Hop Phones</a>
     <a id="loadWorld" href="#" class="button--large--cta admin" data-emit="world" style="width: 95%; margin: 20px auto;">Load World Phones</a>
-    <a id="loadWorld" href="#" class="button button--large admin" data-emit="piano" style="width: 95%; margin: 20px auto;">Load Piano Keys</a>
+    <a id="loadHipR" href="#" class="button button--small admin" data-emit="hiphop" data-random="true" style="width: 95%; margin: 20px auto;">Load Random Hip Hop Phones</a>
+    <a id="loadWorldR" href="#" class="button button--small admin" data-emit="world" data-random="true" style="width: 95%; margin: 20px auto;">Load Random World Phones</a>
     <div class="flex-left units-gap">
       <label class="unit-1-3 text-right" style="width:85px;">Song Length: </label>
       <div class="unit-1">
@@ -24,9 +25,14 @@
   <script type="text/javascript" src="/js/socket.js"></script>
   <script type="text/javascript">
 
-    const triggerReset = (path) => {
+    const triggerReset = (el) => {
+      let path = el.data('emit');
+      let msg = {path: path, random: false}
+      if (el.data('random')) {
+        msg = {path:path, random: true}
+      }
       if (path != undefined) {
-        socket.emit('load_phones', {path: path});
+        socket.emit('load_phones', msg);
       } else {
         socket.emit('reset_phones')
       }
@@ -40,7 +46,7 @@
         $('.admin').click((evt)=> {
           let el = $(evt.currentTarget)
           if (el.data('emit')) {
-            triggerReset(el.data('emit'))
+            triggerReset(el)
           } else {
             triggerReset()
           }

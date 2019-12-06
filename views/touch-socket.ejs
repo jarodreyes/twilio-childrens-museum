@@ -121,7 +121,11 @@
 
       socket.on('load_window', (msg) => {
         if (msg && msg.path) {
-          window.location = `/phone/${msg.path}/${position}`;
+          let path = `/phone/${msg.path}/${position}`
+          if (msg && msg.random) {
+            path = `/phone/${msg.path}/${position}?random=true`
+          }
+          window.location = path;
         }
       });
 

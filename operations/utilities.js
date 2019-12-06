@@ -6,6 +6,7 @@ const nounProject = new NounProject({
     secret: process.env.NOUN_PROJECT_SECRET
 });
 const awsBucket = process.env.AWS_NCM_BUCKET;
+const _ = require('underscore');
 
 const AWS = require('aws-sdk');
  
@@ -64,11 +65,12 @@ const getNotesFromDirectory = (dir) => {
 
 
 // Get list of available notes from asset folder
-const getNoteFromPosition = (genre, position) => {
+const getNoteFromPosition = (genre, position, random) => {
   return new Promise((resolve, reject) => {
       try {
         let pos = parseInt(position) - 1;
-        let note = idealNotes[genre.toLowerCase()][pos];
+        let notes = random && random == true ? _.shuffle(idealNotes[genre.toLowerCase()]) : idealNotes[genre.toLowerCase()];
+        let note = notes[pos];
         resolve(note)
       } catch (e) {
         reject(e);

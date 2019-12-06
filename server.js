@@ -77,8 +77,7 @@ io.on('connection', function (socket) {
     })
 
     socket.on('load_phones', (msg)=> {
-        console.log(`loading ${msg}`);
-        io.emit('load_window', {path: msg.path});
+        io.emit('load_window', msg);
     })
 });
 
@@ -180,6 +179,10 @@ app.get('/', function(req, res){
 })
 .get('/phone/:genre/:position', async function(req, res){
   let note = await getNotePosition(req.params.genre, req.params.position)
+  if (req.query.random) {
+    note = await getNotePosition(req.params.genre, req.params.position, true)
+    console.log(`RANDOM NOTE ----------- ${note}`)
+  }
   let icons = await getIcon(note)
   res.render('touch-socket', {note: note, icons: icons, genre: req.params.genre, position: req.params.position});
 })

@@ -44,7 +44,6 @@ class TonePlayer {
             let p = this.players.get(notes[i]);
             p.mute = true;
             p.loop = true;
-            p.fadeIn = '8n';
             p.sync().start(0);
         };
         console.log(this.players);
